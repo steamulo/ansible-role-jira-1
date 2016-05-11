@@ -4,7 +4,5 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - role: ansible-role-jira
-      jira_hash_salt: "Jeef7Roo2wush0sh"
-      jira_pass: "Xea4aesh"
-      jira_user: "jira"
+    - hswong3i.java
+    - ansible-role-jira
