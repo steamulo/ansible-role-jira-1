@@ -80,7 +80,7 @@ Role Variables
 <tr class="odd">
 <td>jira_hash_salt</td>
 <td>yes</td>
-<td><a href="https://github.com/pantarei/ansible-role-jira/blob/master/defaults/main.yml">defaults/main.yml</a></td>
+<td></td>
 <td></td>
 <td>Specific password hash salt for sha512.</td>
 </tr>
@@ -115,7 +115,7 @@ Role Variables
 <tr class="even">
 <td>jira_pass</td>
 <td>yes</td>
-<td>Xea4aesh</td>
+<td></td>
 <td></td>
 <td>Password for JIRA system user.</td>
 </tr>
@@ -161,7 +161,7 @@ Role Variables
 <tr class="even">
 <td>jira_user</td>
 <td>yes</td>
-<td>jira</td>
+<td></td>
 <td></td>
 <td>Username for JIRA system user.</td>
 </tr>
@@ -178,7 +178,10 @@ Example Playbook
 
     - hosts: servers
       roles:
-        - { role: hswong3i.jira }
+        - role: "hswong3i.jira"
+          jira_hash_salt: "Jeef7Roo2wush0sh"
+          jira_pass: "Xea4aesh"
+          jira_user: "jira"
 
 License
 -------
