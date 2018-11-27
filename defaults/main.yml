@@ -1,24 +1,12 @@
----
-# defaults file for hswong3i.jira
-
-# required variables
-jira_gid: ~
-jira_hash_salt: ~
-jira_pass: ~
-jira_uid: ~
-jira_user: ~
-
-# optional variables with default
-jira_archive: "atlassian-jira-software-7.1.7-jira-7.1.7.tar.gz"
-jira_catalina: "/usr/share/jira"
-jira_checksum: "sha256:2cb08d754072293a23906d7db7ec4bce09a53d783e27145e416f63fd205e59c1"
-jira_connector_port: "8080"
-jira_context_path: ~
+jira_user: "jira"
+jira_url: "https://product-downloads.atlassian.com/software/jira/downloads/{{ jira_archive }}"
+jira_archive: "atlassian-jira-software-{{ jira_version }}.tar.gz"
+jira_version: "7.12.3"
+jira_checksum: "sha256:1baaf8b7e18247bd781cf542621db7c001c205392444462a54179d87f205ca3e"
 jira_home: "/var/lib/jira"
-jira_jvm_maximum_memory: "1024m"
-jira_jvm_minimum_memory: "512m"
-jira_jvm_support_recommended_args: "-Datlassian.plugins.enable.wait=300"
-jira_proxy_name: ~
-jira_scheme: ~
-jira_server_port: "8005"
-jira_url: "https://downloads.atlassian.com/software/jira/downloads/{{ jira_archive }}"
+jira_install_base: "/usr/share/jira"
+jira_install: "{{ jira_install_base }}/{{ jira_version }}"
+jira_proxy_name: "localhost"
+jira_mysql_connector_version: "5.1.47"
+jira_mysql_connector_url: "http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-{{ jira_mysql_connector_version }}.tar.gz"
+jira_mysql_connector_checksum: "md5:8f8e768a91338328f2ac5cd6b6683c88"

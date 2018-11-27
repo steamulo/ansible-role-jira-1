@@ -1,0 +1,14 @@
+[Unit]
+TimeoutSec=200
+LimitNOFILE=2048
+LimitNPROC=2048
+Description=Jira
+After=network.target
+
+[Service]
+Environment=JIRA_HOME={{ jira_home }}
+User={{ jira_user }}
+ExecStart={{ jira_install }}/bin/start-jira.sh -fg
+
+[Install]
+WantedBy=multi-user.target

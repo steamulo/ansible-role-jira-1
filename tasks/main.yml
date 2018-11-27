@@ -1,69 +1,73 @@
----
-# tasks file for hswong3i.jira
-
-- name: create group
+- name: create group Jira
   group:
     name: "{{ jira_user }}"
-    gid: "{{ jira_gid | default(None) or omit }}"
-  notify: restart jira
-  tags: hswong3i.jira
+    state: present
 
-- name: create user
+- name: create user Jira
   user:
     name: "{{ jira_user }}"
-    password: "{{ jira_pass | password_hash('sha512', jira_hash_salt) }}"
-    home: "{{ jira_home }}"
     group: "{{ jira_user }}"
-    uid: "{{ jira_uid | default(None) or omit }}"
-    shell: "/bin/bash"
-  notify: restart jira
-  tags: hswong3i.jira
 
-- name: prepare files
+- name: prepare directories
   file:
-    path: "{{ item.path }}"
-    owner: "{{ item.owner }}"
-    group: "{{ item.group }}"
-    mode: "{{ item.mode }}"
-    state: "{{ item.state }}"
+    path: "{{ item }}"
+    owner: "{{ jira_user }}"
+    group: "{{ jira_user }}"
+    mode: "0755"
+    state: "directory"
   with_items:
-    - { path: "{{ jira_catalina }}", owner: "{{ jira_user }}", group: "{{ jira_user }}", mode: "0755", state: "directory" }
-  notify: restart jira
-  tags: hswong3i.jira
+    - "{{ jira_home }}"
+    - "{{ jira_install }}"
 
 - name: download package
   get_url:
     url: "{{ jira_url }}"
     dest: "/tmp/{{ jira_archive }}"
     checksum: "{{ jira_checksum }}"
-  tags: hswong3i.jira
 
 - name: unarchive package
   shell: |
-    tar zxvf /tmp/{{ jira_archive }} -C {{ jira_catalina }} --strip-components=1
-    chown -Rf {{ jira_user }}:{{ jira_user }} {{ jira_catalina }}
+    tar zxvf /tmp/{{ jira_archive }} -C {{ jira_install }} --strip-components=1
+    chown -Rf {{ jira_user }}:{{ jira_user }} {{ jira_install }}
   args:
-    creates: "{{ jira_catalina }}/bin/start-jira.sh"
+    creates: "{{ jira_install }}/bin/start-jira.sh"
   notify: restart jira
-  tags: hswong3i.jira
 
-- name: copy templates
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    owner: "{{ item.owner }}"
-    group: "{{ item.group }}"
-    mode: "{{ item.mode }}"
-  with_items:
-    - { src: "etc/init.d/jira.j2", dest: "/etc/init.d/jira", owner: "root", group: "root", mode: "0755" }
-    - { src: "usr/share/jira/bin/setenv.sh.j2", dest: "{{ jira_catalina }}/bin/setenv.sh", owner: "{{ jira_user }}", group: "{{ jira_user }}", mode: "0644" }
-    - { src: "usr/share/jira/conf/server.xml.j2", dest: "{{ jira_catalina }}/conf/server.xml", owner: "{{ jira_user }}", group: "{{ jira_user }}", mode: "0644" }
+- name: unarchive mysql connector package
+  unarchive:
+    remote_src: yes
+    src: "{{ jira_mysql_connector_url }}"
+    dest: "/tmp"
+    group: "{{ jira_user }}"
+    owner: "{{ jira_user }}"
+
+- name: move mysql connector package
+  shell: |
+    mv /tmp/mysql-connector-java-{{ jira_mysql_connector_version }}/mysql-connector-java-{{ jira_mysql_connector_version }}.jar {{ jira_install }}/lib
+    chmod 0444 {{ jira_install }}/lib/mysql-connector-java-{{ jira_mysql_connector_version }}.jar
+    chown {{ jira_user }}:{{ jira_user }} {{ jira_install }}/lib/mysql-connector-java-{{ jira_mysql_connector_version }}.jar
+  args:
+    creates: "{{ jira_install }}/lib/mysql-connector-java-{{ jira_mysql_connector_version }}.jar"
   notify: restart jira
-  tags: hswong3i.jira
+
+- name: Create systemd unit file
+  template:
+    src: jira.service.j2
+    dest: /etc/systemd/system/jira.service
+    owner: root
+    group: root
+    mode: 0744
+
+- name: Create server config file
+  template:
+    src: server.xml.j2
+    dest: "{{ jira_install }}/conf/server.xml"
+    owner: "{{ jira_user }}"
+    group: "{{ jira_user }}"
+    mode: 0444
 
 - name: enable service
   service:
     name: "jira"
     enabled: "yes"
   notify: restart jira
-  tags: hswong3i.jira
