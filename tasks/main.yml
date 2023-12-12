@@ -33,17 +33,15 @@
     creates: "{{ jira_install }}/bin/start-jira.sh"
   notify: restart jira
 
-- name: unarchive mysql connector package
-  unarchive:
-    remote_src: yes
-    src: "{{ jira_mysql_connector_url }}"
-    dest: "/tmp"
-    group: "{{ jira_user }}"
-    owner: "{{ jira_user }}"
+- name: download mysql-connector package
+  get_url:
+    url: "{{ jira_mysql_connector_url }}"
+    dest: "/tmp/{{ jira_mysql_connector_archive }}"
+    checksum: "{{ jira_mysql_connector_checksum }}"
 
-- name: move mysql connector package
+- name: unarchive mysql-connector package
   shell: |
-    mv /tmp/mysql-connector-java-{{ jira_mysql_connector_version }}/mysql-connector-java-{{ jira_mysql_connector_version }}.jar {{ jira_install }}/lib
+    tar zxvf /tmp/{{ jira_mysql_connector_archive }} -C {{ jira_install }}/lib --strip-components=1
     chmod 0444 {{ jira_install }}/lib/mysql-connector-java-{{ jira_mysql_connector_version }}.jar
     chown {{ jira_user }}:{{ jira_user }} {{ jira_install }}/lib/mysql-connector-java-{{ jira_mysql_connector_version }}.jar
   args:
