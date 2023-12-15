@@ -42,10 +42,10 @@
 - name: unarchive mysql-connector package
   shell: |
     tar zxvf /tmp/{{ jira_mysql_connector_archive }} -C {{ jira_install }}/lib --strip-components=1
-    chmod 0444 {{ jira_install }}/lib/mysql-connector-java-{{ jira_mysql_connector_version }}.jar
-    chown {{ jira_user }}:{{ jira_user }} {{ jira_install }}/lib/mysql-connector-java-{{ jira_mysql_connector_version }}.jar
+    chmod 0444 {{ jira_install }}/lib/{{ jira_mysql_connector_file_name }}.jar
+    chown {{ jira_user }}:{{ jira_user }} {{ jira_install }}/lib/{{ jira_mysql_connector_file_name }}.jar
   args:
-    creates: "{{ jira_install }}/lib/mysql-connector-java-{{ jira_mysql_connector_version }}.jar"
+    creates: "{{ jira_install }}/lib/{{ jira_mysql_connector_file_name }}.jar"
   notify: restart jira
 
 - name: Create systemd unit file
